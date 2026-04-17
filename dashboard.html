@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Railway Track Crack Detection System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="dashboard.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+  <body class="min-h-screen">
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="title-block">
+          <div class="title-icon">
+            <i class="fa-solid fa-train-subway"></i>
+          </div>
+          <div>
+            <div class="title-main">AI Railway Track Crack Detection System</div>
+            <div class="title-sub">
+              Real-time visual inspection and railway integrity monitoring
+            </div>
+          </div>
+        </div>
+        <div class="header-metrics">
+          <div class="chip">
+            <i class="fa-solid fa-satellite-dish"></i>
+            Camera:
+            <span id="camStatus">Standby</span>
+          </div>
+          <div class="chip">
+            <i class="fa-solid fa-gauge-high"></i>
+            FPS:
+            <span id="fpsValue">0</span>
+          </div>
+          <div class="chip">
+            <i class="fa-regular fa-clock"></i>
+            <span id="clock">--:--:--</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-grid">
+        <section class="panel left-panel">
+          <div class="card live-card">
+            <div class="card-header">
+              <span class="card-title">Live Camera Feed</span>
+              <div class="live-indicator" id="liveIndicator">
+                <span class="live-dot"></span>
+                <span class="live-text">LIVE</span>
+              </div>
+            </div>
+            <div class="media-wrapper">
+              <img
+                id="liveFeed"
+                src="track1.jfif"
+                alt="Live camera feed"
+              />
+              <div class="overlay">
+                <div
+                  class="bbox"
+                  id="bboxOverlay"
+                  style="--x: 38; --y: 18; --w: 22; --h: 45"
+                >
+                  <span class="bbox-label" id="bboxLabel">crack 0.95</span>
+                </div>
+                <div class="scanline"></div>
+              </div>
+            </div>
+            <div class="feed-footer">
+              <div class="confidence-ring" id="confidenceRing" style="--value: 92">
+                <span id="confidenceRingText">92%</span>
+                <small>Confidence</small>
+              </div>
+              <div class="feed-stats">
+                <div class="feed-stat">
+                  <span>Detection</span>
+                  <strong id="resultTag">Crack Detected</strong>
+                </div>
+                <div class="feed-stat">
+                  <span>Frame</span>
+                  <strong id="frameId">F-10248</strong>
+                </div>
+                <div class="feed-stat">
+                  <span>Edge Intensity</span>
+                  <strong id="edgeText">15.9</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card info-card">
+            <div class="card-header">
+              <span class="card-title">Detection Information</span>
+              <button class="icon-btn" id="snapshotBtn" title="Snapshot">
+                <i class="fa-solid fa-camera"></i>
+              </button>
+            </div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Detection Result</span>
+                <strong class="info-value" id="infoResult">Crack Detected</strong>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Confidence Score</span>
+                <strong class="info-value" id="infoConfidence">95.0%</strong>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Timestamp</span>
+                <strong class="info-value" id="infoTimestamp">--</strong>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Bounding Box</span>
+                <strong class="info-value" id="bboxText"
+                  >[0.38, 0.18, 0.22, 0.45]</strong
+                >
+              </div>
+              <div class="info-item">
+                <span class="info-label">Edge Intensity</span>
+                <strong class="info-value" id="infoEdge">15.9</strong>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Validation</span>
+                <strong class="info-value" id="infoValidation">Pass</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card metric-card">
+            <div class="card-header">
+              <span class="card-title">Crack Metrics</span>
+              <span class="tag">Advanced</span>
+            </div>
+            <div class="metric">
+              <div class="metric-top">
+                <span>Severity Level</span>
+                <strong id="severityValue" class="severity high">High</strong>
+              </div>
+              <div class="meter">
+                <div class="meter-fill" id="severityBar"></div>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="metric-top">
+                <span>Crack Length (cm)</span>
+                <strong id="lengthValue">18.4</strong>
+              </div>
+              <div class="meter">
+                <div class="meter-fill length" id="lengthBar"></div>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="metric-top">
+                <span>Edge Intensity</span>
+                <strong id="edgeValue">15.9</strong>
+              </div>
+              <div class="meter">
+                <div class="meter-fill intensity" id="edgeBar"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel center-panel">
+          <div class="card stages-card">
+            <div class="card-header">
+              <span class="card-title">Image Processing Stages</span>
+              <div class="pipeline">
+                <span>Pipeline</span>
+                <div class="pipeline-track">
+                  <div class="pipeline-fill" id="pipelineProgress"></div>
+                </div>
+              </div>
+            </div>
+            <div class="stage-grid">
+              <div class="stage-card">
+                <div class="stage-title">Edge Detection</div>
+                <div class="stage-media">
+                  <img
+                    id="stageEdge"
+                    src="track1.jfif"
+                    alt="Edge Detection"
+                    class="stage-img edge"
+                  />
+                  <span class="stage-tag">EDGE</span>
+                </div>
+              </div>
+              <div class="stage-card">
+                <div class="stage-title">Morphological Processing</div>
+                <div class="stage-media">
+                  <img
+                    id="stageMorph"
+                    src="track1.jfif"
+                    alt="Morphological Processing"
+                    class="stage-img morph"
+                  />
+                  <span class="stage-tag">MORPH</span>
+                </div>
+              </div>
+              <div class="stage-card">
+                <div class="stage-title">Crack Segmentation</div>
+                <div class="stage-media">
+                  <img
+                    id="stageSegment"
+                    src="tract2.jfif"
+                    alt="Crack Segmentation"
+                    class="stage-img segment"
+                  />
+                  <span class="stage-tag">SEGMENT</span>
+                </div>
+              </div>
+              <div class="stage-card">
+                <div class="stage-title">Crack Validation</div>
+                <div class="stage-media">
+                  <img
+                    id="stageValidate"
+                    src="track1.jfif"
+                    alt="Crack Validation"
+                    class="stage-img validate"
+                  />
+                  <span class="stage-tag">VALIDATE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card performance-card">
+            <div class="card-header">
+              <span class="card-title">System Performance Metrics</span>
+              <div class="perf-badges">
+                <span class="chip chip-green"
+                  >FPS: <span id="fpsCounter">0</span></span
+                >
+                <span class="chip chip-blue"
+                  >Latency: <span id="latencyValue">--</span> ms</span
+                >
+              </div>
+            </div>
+            <div class="performance-grid">
+              <div class="chart-box">
+                <canvas id="perfChart"></canvas>
+              </div>
+              <div class="perf-stats">
+                <div class="stat-card">
+                  <span>GPU Load</span>
+                  <strong id="gpuLoad">42%</strong>
+                  <div class="meter small">
+                    <div class="meter-fill gpu" id="gpuBar"></div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <span>CPU Load</span>
+                  <strong id="cpuLoad">35%</strong>
+                  <div class="meter small">
+                    <div class="meter-fill cpu" id="cpuBar"></div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <span>Thermal</span>
+                  <strong id="tempValue">58 C</strong>
+                  <div class="meter small">
+                    <div class="meter-fill temp" id="tempBar"></div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <span>Edge Density</span>
+                  <strong id="edgeDensity">0.71</strong>
+                  <div class="meter small">
+                    <div class="meter-fill intensity" id="edgeDensityBar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel right-panel">
+          <div class="card control-card">
+            <div class="card-header">
+              <span class="card-title">Control Panel</span>
+              <div class="control-icons">
+                <button class="icon-btn" id="muteBtn" title="Mute Alerts">
+                  <i class="fa-solid fa-bell-slash"></i>
+                </button>
+                <button class="icon-btn" id="settingsMini" title="Quick Settings">
+                  <i class="fa-solid fa-sliders"></i>
+                </button>
+              </div>
+            </div>
+            <button class="control-btn start" id="startBtn">
+              <i class="fa-solid fa-play"></i>
+              Start Detection
+            </button>
+            <button class="control-btn stop" id="stopBtn">
+              <i class="fa-solid fa-stop"></i>
+              Stop Detection
+            </button>
+            <button class="control-btn neutral" id="settingsBtn">
+              <i class="fa-solid fa-gear"></i>
+              Settings
+            </button>
+            <button class="control-btn danger" id="exitBtn">
+              <i class="fa-solid fa-power-off"></i>
+              Exit System
+            </button>
+            <div class="control-footer">
+              <div class="status-chip" id="systemStatus">System Idle</div>
+            </div>
+          </div>
+
+          <div class="card quick-card">
+            <div class="card-header">
+              <span class="card-title">Quick Tools</span>
+            </div>
+            <div class="quick-grid">
+              <button class="quick-btn" id="autoCaptureBtn">
+                <i class="fa-solid fa-camera-retro"></i>
+                Auto Capture
+              </button>
+              <button class="quick-btn" id="autoAlertBtn">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Auto Alert
+              </button>
+              <button class="quick-btn" id="saveLogBtn">
+                <i class="fa-solid fa-file-arrow-down"></i>
+                Save Logs
+              </button>
+              <button class="quick-btn" id="exportBtn">
+                <i class="fa-solid fa-share-nodes"></i>
+                Export Data
+              </button>
+            </div>
+          </div>
+
+          <div class="card status-card">
+            <div class="card-header">
+              <span class="card-title">Live Status</span>
+            </div>
+            <div class="status-list">
+              <div class="status-item">
+                <span class="status-label">Camera</span>
+                <strong id="cameraState">Offline</strong>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Detector</span>
+                <strong id="detectorState">Idle</strong>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Queue</span>
+                <strong id="queueDepth">0</strong>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Alerts</span>
+                <strong id="alertCount">0</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <section class="card logs-card">
+        <div class="card-header">
+          <span class="card-title">Live System Logs</span>
+          <span class="tag">Streaming</span>
+        </div>
+        <div class="log-list" id="logList">
+          <div class="log-line">
+            <span class="log-time">[--:--:--]</span> Frame successfully captured
+          </div>
+          <div class="log-line">
+            <span class="log-time">[--:--:--]</span> Processing frame...
+          </div>
+          <div class="log-line">
+            <span class="log-time">[--:--:--]</span> Crack detected
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>
